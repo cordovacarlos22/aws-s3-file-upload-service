@@ -31,6 +31,7 @@ import { v4 as uuidv4 } from 'uuid';
 // ----------------------------------------------------------------
 //! multiple files upload at the same time with custom name 
 
+/// to customize file upload name 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
     cb(null, 'uploads/');
@@ -39,9 +40,18 @@ const storage = multer.diskStorage({
     const { originalname } = file;
     cb(null, `${uuidv4()}-${originalname}`);
   }
-})
+});
+
+// filter to only take images 
+const fileFilter = (req, file, cb) => {
+  if (file.mimetype.split('/')[0] === 'image') {
+    cb(null, true);
+  } else {
+    cb(new Error("File is not of the correct type"), false);
+  }
+};
 // Configure multer for file uploads
-const upload = multer({ storage });
+const upload = multer({ storage, fileFilter });
 
 // Specify 'file' as the field name for the uploaded file and limit the upload to 2 files
 const uploadMultipleFilesWithCustomName = upload.array('file', 2);
