@@ -1,7 +1,9 @@
 
-const upload = async (req, res) => {
+
+const upload = async (error, req, res) => {
 
   try {
+    
 
     if (!req.files) {
 

@@ -2,11 +2,11 @@ import express from 'express';
 
 import *  as uploadController from '../controllers/upload.controller.js';
 
-import { uploadMultipleFilesWithCustomName } from '../middlewares/uploadFile.middleware.js';
+import { uploadMultipleFilesWithCustomName, multerErrorHandler } from '../middlewares/uploadFile.middleware.js';
 
 const uploadRoutes = express.Router();
 
-uploadRoutes.post('/upload', uploadMultipleFilesWithCustomName, uploadController.upload);
+uploadRoutes.post('/upload', multerErrorHandler(uploadMultipleFilesWithCustomName), uploadController.upload);
 
 
 
