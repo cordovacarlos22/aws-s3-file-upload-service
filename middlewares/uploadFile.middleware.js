@@ -47,7 +47,7 @@ const fileFilter = (req, file, cb) => {
   if (file.mimetype.split('/')[0] === 'image') {
     cb(null, true);
   } else {
-    cb(new Error("File is not of the correct type"), false);
+    cb(new multer.MulterError('LIMIT_UNEXPECTED_FILE'), false);
   }
 };
 // Configure multer for file uploads
@@ -68,6 +68,8 @@ const multerErrorHandler = (upload) => (req, res, next) => {
         return res.status(400).json({ message: 'File too large. Maximum size is 5MB' });
       } else if (error.code === 'LIMIT_FILE_COUNT') {
         return res.status(400).json({ message: 'Too many files uploaded. Only 1 file is allowed' });
+      } else if (error.code === 'LIMIT_UNEXPECTED_FILE') {
+        return res.status(400).json({ message: 'Only images are allowed, file must be an image type' });
       }
     }
     next();
