@@ -1,6 +1,6 @@
 import express from "express";
 import dotenv from "dotenv";
-
+import morgan from 'morgan';
 import uploadRoutes from "./routes/upload.route.js";
 
 
@@ -13,9 +13,18 @@ const app = express();
 
 app.use(express.json());
 
-app.use("/api/", uploadRoutes);
+// morgan test 
+morgan.token('files', (req) => {
+  // Safely stringify req.files or return 'No files' if undefined
+  return req.files ? JSON.stringify(req.files) : 'No files uploaded';
+});
+app.use(morgan('tiny'));
+app.use(morgan(':files'));
 
 // Routes
+app.use("/api/", uploadRoutes);
+
+
 
 
 app.listen(PORT, () => {
