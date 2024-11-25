@@ -2,13 +2,13 @@ import multer from "multer";
 import { v4 as uuidv4 } from 'uuid';
 
 // //! single file upload 
-// // Configure multer for file uploads
+// Configure multer for file uploads
 // const upload = multer({ dest: 'uploads/' });
 
 // // Specify 'file' as the field name for the uploaded file and limit the upload to 2 files
 // const uploadSingleFile = upload.single('file');
-//? ________________________________________________________________
-//! multiple files upload at the same time
+// ? ________________________________________________________________
+// ! multiple files upload at the same time
 // Configure multer for file uploads
 // const upload = multer({ dest: 'uploads/' });
 
@@ -29,18 +29,42 @@ import { v4 as uuidv4 } from 'uuid';
 
 
 // ----------------------------------------------------------------
-//! multiple files upload at the same time with custom name 
+//! multiple files upload at the same time with custom name  localy uploaded
 
-/// to customize file upload name 
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, 'uploads/');
-  },
-  filename: (req, file, cb) => {
-    const { originalname } = file;
-    cb(null, `${uuidv4()}-${originalname}`);
-  }
-});
+// /// to customize file upload name 
+// const storage = multer.diskStorage({
+//   destination: (req, file, cb) => {
+//     cb(null, 'uploads/');
+//   },
+//   filename: (req, file, cb) => {
+//     const { originalname } = file;
+//     cb(null, `${uuidv4()}-${originalname}`);
+//   }
+// });
+
+// // filter to only take images 
+// const fileFilter = (req, file, cb) => {
+//   if (file.mimetype.split('/')[0] === 'image') {
+//     cb(null, true);
+//   } else {
+//     cb(new multer.MulterError('LIMIT_UNEXPECTED_FILE'), false);
+//   }
+// };
+// // Configure multer for file uploads
+// const upload = multer({
+//   storage,
+//   fileFilter,
+//   limits: { fileSize: 1024 * 1024 * 5, files: 1 } // 5MB and only takes 1 file
+// });
+
+// // Specify 'file' as the field name for the uploaded file and limit the upload to 2 files
+// const uploadMultipleFilesWithCustomName = upload.array('file');
+
+
+
+//! updaload single file to s3 aws using memory storage 
+/// to customize file upload name
+const storage = multer.memoryStorage();
 
 // filter to only take images 
 const fileFilter = (req, file, cb) => {
@@ -58,9 +82,12 @@ const upload = multer({
 });
 
 // Specify 'file' as the field name for the uploaded file and limit the upload to 2 files
-const uploadMultipleFilesWithCustomName = upload.array('file');
+const uploadSingleFileToS3 = upload.array('file');
+
+//! upload multile file to s3 aws using all promises
 
 
+//! error handler from multer error 
 const multerErrorHandler = (upload) => (req, res, next) => {
   upload(req, res, (error) => {
     if (error instanceof multer.MulterError) {
@@ -77,6 +104,6 @@ const multerErrorHandler = (upload) => (req, res, next) => {
 };
 
 export {
-  uploadMultipleFilesWithCustomName,
+  uploadSingleFileToS3,
   multerErrorHandler
 };
