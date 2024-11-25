@@ -78,33 +78,33 @@ const s3UploadV3 = async (files) => {
   const s3Client = new S3Client();
 
   const awsBucktName = process.env.AWS_BUCKET_NAME
+ // Create parameters for each file
+  const params = files.map((file) => {
+    // Generate a unique key for each file
+    const key = `upload/${uuidv4()}-${file.originalname || "file"}`;
 
-  
+    return {
+      Bucket: awsBucktName,
+      Key: key,
+      Body: file.buffer,
+    };
+  });
 
-  // Map each file to a promise that uploads and returns the result with its URL
+  // Upload all files in parallel
   const results = await Promise.all(
-    files.map(async (file) => {
-      const key = `upload/${uuidv4()}-${file.originalname}`; // Generate unique key
-
-      const params = {
-        Bucket: awsBucktName,
-        Key: key,
-        Body: file.buffer,
-      };
-
-      // Upload file to S3
-      const result = await s3Client.send(new PutObjectCommand(params));
-
-      // Attach the public URL to the result
-      return {
-        ...result, // AWS response metadata
-        url: `https://${awsBucktName}.s3.us-west-1.amazonaws.com/${key}`,
-      };
-    })
-
+    params.map((param) => s3Client.send(new PutObjectCommand(param)))
   );
 
-  return results; // Array of results, each with its corresponding URL
+  // Generate public URLs for all files
+  const urls = params.map((param) =>
+    `https://${awsBucktName}.s3.us-west-1.amazonaws.com/${param.Key}`
+  );
+
+
+  return {
+    results, // AWS metadata for each file upload
+    urls,    // Public URLs for all files
+  };
 };
 
 
