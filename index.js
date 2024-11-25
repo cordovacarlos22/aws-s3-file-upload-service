@@ -2,6 +2,7 @@ import express from "express";
 import dotenv from "dotenv";
 import morgan from 'morgan';
 import uploadRoutes from "./routes/upload.route.js";
+import { connect } from "./config/db.js";
 
 
 dotenv.config();
@@ -26,8 +27,10 @@ app.use("/api/", uploadRoutes);
 
 
 
-
-app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
+connect().then(() => {
+  app.listen(PORT, () => {
+    console.log(`Server is running on port ${PORT} 🟢`);
+  });
 });
+
 
